@@ -1,6 +1,11 @@
 
 #include <string.h>
 
+#include <lua.h>
+#if LUA_VERSION_NUM >= 502
+#define lua_objlen lua_rawlen
+#endif
+
 // Useful macros for dealing with ustrings
 // meta_idx and pool_idx indices must be positive!
 

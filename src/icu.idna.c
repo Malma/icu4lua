@@ -232,6 +232,13 @@ int luaopen_icu_idna(lua_State *L) {
 	icu4lua_pushustringpool(L);
 	IDX_USTRING_POOL = lua_gettop(L);
 
+#if LUA_VERSION_NUM >= 502
+	lua_newtable(L);
+	IDX_IDNA_LIB = lua_gettop(L);
+	lua_pushvalue(L, IDX_USTRING_META);
+	lua_pushvalue(L, IDX_USTRING_POOL);
+	luaL_setfuncs(L, icu_idna_lib, 2);
+#else
 	luaL_register(L, "icu.idna", &null_entry);
 	IDX_IDNA_LIB = lua_gettop(L);
 	for (lib_entry = icu_idna_lib; lib_entry->name; lib_entry++) {
@@ -241,5 +248,6 @@ int luaopen_icu_idna(lua_State *L) {
 		lua_pushcclosure(L, lib_entry->func, 2);
 		lua_rawset(L, IDX_IDNA_LIB);
 	}
+#endif
 	return 1;
 }

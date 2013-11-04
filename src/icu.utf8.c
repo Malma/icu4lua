@@ -846,7 +846,11 @@ static int icu4lua_loadfile(lua_State *L, const char* filename) {
 		lf.extraline = 0;
 	}
 	ungetc(c, lf.f);
+#if LUA_VERSION_NUM >= 502
+	status = lua_load(L, getF, &lf, filename, NULL);
+#else
 	status = lua_load(L, getF, &lf, filename);
+#endif
 	readstatus = ferror(lf.f);
 	fclose(lf.f);  // close file (even in case of errors)
 	if (readstatus) {
@@ -904,7 +908,11 @@ static const luaL_Reg icu_utf8_lib[] = {
 };
 
 int luaopen_icu_utf8(lua_State *L) {
+#if LUA_VERSION_NUM >= 502
+	luaL_newlibtable(L, icu_utf8_lib);
+#else
 	luaL_register(L, "icu.utf8", icu_utf8_lib);
+#endif
 
     lua_pushliteral(L,"\xEF\xBB\xBF");
 	lua_setfield(L,-2,"bom");

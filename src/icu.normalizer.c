@@ -209,6 +209,13 @@ int luaopen_icu_normalizer(lua_State *L) {
 	icu4lua_pushustringpool(L);
 	IDX_USTRING_POOL = lua_gettop(L);
 
+#if LUA_VERSION_NUM >= 502
+	lua_newtable(L);
+	IDX_NORMALIZER_LIB = lua_gettop(L);
+	lua_pushvalue(L, IDX_USTRING_META);
+	lua_pushvalue(L, IDX_USTRING_POOL);
+	luaL_setfuncs(L, icu_normalizer_lib, 2);
+#else
 	luaL_register(L, "icu.normalizer", &null_entry);
 	IDX_NORMALIZER_LIB = lua_gettop(L);
 	for (lib_entry = icu_normalizer_lib; lib_entry->name; lib_entry++) {
@@ -217,6 +224,7 @@ int luaopen_icu_normalizer(lua_State *L) {
 		lua_pushcclosure(L, lib_entry->func, 2);
 		lua_setfield(L, IDX_NORMALIZER_LIB, lib_entry->name);
 	}
+#endif
 	for (lib_constant = normalizer_constants; lib_constant->name; lib_constant++) {
 		lua_pushnumber(L, lib_constant->value);
 		lua_setfield(L, IDX_NORMALIZER_LIB, lib_constant->name);

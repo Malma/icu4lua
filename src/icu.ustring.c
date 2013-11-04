@@ -997,6 +997,16 @@ int luaopen_icu_ustring(lua_State *L) {
 	lua_setfield(L,-2,"__mode");
 	lua_setmetatable(L,IDX_USTRING_POOL);
 	
+#if LUA_VERSION_NUM >= 502
+	// Create the lib table
+	lua_newtable(L);
+	IDX_USTRING_LIB = lua_gettop(L);
+
+	// Populate the lib table, adding the upvalues for the metatable and pool to each entry
+	lua_pushvalue(L, IDX_USTRING_META);
+	lua_pushvalue(L, IDX_USTRING_POOL);
+	luaL_setfuncs(L, icu_ustring_lib, 2);
+#else
 	// Create the lib table
 	luaL_register(L, "icu.ustring", &null_entry);
 	IDX_USTRING_LIB = lua_gettop(L);
@@ -1009,6 +1019,7 @@ int luaopen_icu_ustring(lua_State *L) {
 		lua_pushcclosure(L, lib_entry->func, 2);
 		lua_rawset(L, IDX_USTRING_LIB);
 	}
+#endif
 
 	// Set the "index" metamethod to lookup the lib table
 	lua_pushvalue(L, IDX_USTRING_LIB);

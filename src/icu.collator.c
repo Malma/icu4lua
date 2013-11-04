@@ -150,7 +150,11 @@ int luaopen_icu_collator(lua_State *L) {
 	icu4lua_requireustringlib(L);
 
 	luaL_newmetatable(L, "icu.collator");
+#if LUA_VERSION_NUM >= 502
+	luaL_setfuncs(L, icu_collator_meta, 0);
+#else
 	luaL_register(L, NULL, icu_collator_meta);
+#endif
 	IDX_COLLATOR_META = lua_gettop(L);
 
 	icu4lua_pushustringmetatable(L);
@@ -159,6 +163,14 @@ int luaopen_icu_collator(lua_State *L) {
 	icu4lua_pushustringpool(L);
 	IDX_USTRING_POOL = lua_gettop(L);
 
+#if LUA_VERSION_NUM >= 502
+	lua_newtable(L);
+	IDX_COLLATOR_LIB = lua_gettop(L);
+	lua_pushvalue(L, IDX_COLLATOR_META);
+	lua_pushvalue(L, IDX_USTRING_META);
+	lua_pushvalue(L, IDX_USTRING_POOL);
+	luaL_setfuncs(L, icu_collator_lib, 3);
+#else
 	luaL_register(L, "icu.collator", &null_entry);
 	IDX_COLLATOR_LIB = lua_gettop(L);
 	for (lib_entry = icu_collator_lib; lib_entry->name; lib_entry++) {
@@ -169,6 +181,7 @@ int luaopen_icu_collator(lua_State *L) {
 		lua_pushcclosure(L, lib_entry->func, 3);
 		lua_rawset(L, IDX_COLLATOR_LIB);
 	}
+#endif
 	for (lib_constant = icu_collator_lib_constants; lib_constant->name; lib_constant++) {
 		lua_pushstring(L, lib_constant->name);
 		lua_pushnumber(L, lib_constant->value);

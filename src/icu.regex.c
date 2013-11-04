@@ -990,7 +990,11 @@ int luaopen_icu_regex(lua_State *L) {
 	IDX_REGEX_META = lua_gettop(L);
 
 	luaL_newmetatable(L, "icu.regex match");
+#if LUA_VERSION_NUM >= 502
+	luaL_setfuncs(L, icu_regex_match_meta, 0);
+#else
 	luaL_register(L, NULL, icu_regex_match_meta);
+#endif
 	IDX_MATCH_META = lua_gettop(L);
 
 	icu4lua_pushustringmetatable(L);
@@ -1010,7 +1014,11 @@ int luaopen_icu_regex(lua_State *L) {
 	icu4lua_pushustringpool(L);
 	IDX_USTRING_POOL = lua_gettop(L);
 	
+#if LUA_VERSION_NUM >= 502
+	lua_newtable(L);
+#else
 	luaL_register(L, "icu.regex", &null_entry);
+#endif
 	IDX_REGEX_LIB = lua_gettop(L);
 
 	lua_pushvalue(L, IDX_REGEX_META);

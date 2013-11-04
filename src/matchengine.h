@@ -1,5 +1,8 @@
 
 #include <luaconf.h>
+#if !defined(LUA_MAXCAPTURES)
+#define LUA_MAXCAPTURES 32
+#endif
 
 #define CAP_SUCCESSFUL	(0)
 #define CAP_UNFINISHED  (-1)

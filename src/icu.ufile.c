@@ -305,9 +305,22 @@ int luaopen_icu_ufile(lua_State *L) {
 	IDX_USTRING_POOL = lua_gettop(L);
 	
 	luaL_newmetatable(L, "UFILE*");
+#if LUA_VERSION_NUM >= 502
+	luaL_setfuncs(L, icu_ufile_meta, 0);
+#else
 	luaL_register(L, NULL, icu_ufile_meta);
+#endif
 	IDX_UFILE_META = lua_gettop(L);
 
+#if LUA_VERSION_NUM >= 502
+	lua_newtable(L);
+	IDX_UFILE_LIB = lua_gettop(L);
+	lua_pushvalue(L, IDX_UFILE_META);
+	lua_pushvalue(L, IDX_USTRING_META);
+	lua_pushvalue(L, IDX_USTRING_POOL);
+	lua_pushnil(L);
+	luaL_setfuncs(L, icu_ufile_lib, 4);
+#else
 	luaL_register(L, "icu.ufile", &null_entry);
 	IDX_UFILE_LIB = lua_gettop(L);
 
@@ -319,6 +332,7 @@ int luaopen_icu_ufile(lua_State *L) {
 		lua_pushcclosure(L, lib_entry->func, 4);
 		lua_setfield(L, IDX_UFILE_LIB, lib_entry->name);
 	}
+#endif
 
 	lua_pushvalue(L, IDX_UFILE_LIB);
 	lua_setfield(L, IDX_UFILE_META, "__index");

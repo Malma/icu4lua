@@ -155,9 +155,21 @@ int luaopen_icu_stringprep(lua_State *L) {
 	IDX_USTRING_POOL = lua_gettop(L);
 
 	luaL_newmetatable(L, "icu.stringprep");
+#if LUA_VERSION_NUM >= 502
+	luaL_setfuncs(L, icu_stringprep_meta, 0);
+#else
 	luaL_register(L, NULL, icu_stringprep_meta);
+#endif
 	IDX_STRINGPREP_META = lua_gettop(L);
 
+#if LUA_VERSION_NUM >= 502
+	lua_newtable(L);
+	IDX_STRINGPREP_LIB = lua_gettop(L);
+	lua_pushvalue(L, IDX_STRINGPREP_META);
+	lua_pushvalue(L, IDX_USTRING_META);
+	lua_pushvalue(L, IDX_USTRING_POOL);
+	luaL_setfuncs(L, icu_stringprep_lib, 3);
+#else
 	luaL_register(L, "icu.stringprep", &null_entry);
 	IDX_STRINGPREP_LIB = lua_gettop(L);
 	for (lib_entry = icu_stringprep_lib; lib_entry->name; lib_entry++) {
@@ -168,6 +180,7 @@ int luaopen_icu_stringprep(lua_State *L) {
 		lua_pushcclosure(L, lib_entry->func, 3);
 		lua_rawset(L, IDX_STRINGPREP_LIB);
 	}
+#endif
 
 	lua_pushvalue(L, IDX_STRINGPREP_LIB);
 	lua_setfield(L, IDX_STRINGPREP_META, "__index");
