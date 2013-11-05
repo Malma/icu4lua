@@ -62,7 +62,7 @@ static const luaL_Reg icu_lib[] = {
 
 int luaopen_icu(lua_State *L) {
 #if LUA_VERSION_NUM >= 502
-	luaL_newlibtable(L, icu_lib);
+	luaL_newlib(L, icu_lib);
 #else
 	luaL_register(L, "icu", icu_lib);
 #endif

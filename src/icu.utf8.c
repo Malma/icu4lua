@@ -909,7 +909,7 @@ static const luaL_Reg icu_utf8_lib[] = {
 
 int luaopen_icu_utf8(lua_State *L) {
 #if LUA_VERSION_NUM >= 502
-	luaL_newlibtable(L, icu_utf8_lib);
+	luaL_newlib(L, icu_utf8_lib);
 #else
 	luaL_register(L, "icu.utf8", icu_utf8_lib);
 #endif
